@@ -1,0 +1,19 @@
+{
+  "name": "alfabet_automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run-tests": "npx playwright test",
+    "run-tests-headed": "npx playwright test --headed",
+    "report": "npx playwright show-report",
+    "debug": "npx playwright test --debug"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.7.0"
+  }
+}
