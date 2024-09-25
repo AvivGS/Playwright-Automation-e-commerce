@@ -10,6 +10,7 @@ const loginPayload = {
 
 const cookieTokenName = "tokenp_";
 let cookieTokenValue = "";
+const itemToAddToCart = "Samsung galaxy s6";
 
 test.beforeAll(async () => {
   const apiContext = await request.newContext();
@@ -41,6 +42,23 @@ test("Add a product to Cart", async () => {
   // Wait for the logout button to appear
   const logoutBtn = page.locator('[id="logout2"]');
   await logoutBtn.waitFor();
+
+  const itemToAddToCartLink = page.locator(`a:text("${itemToAddToCart}")`);
+  await itemToAddToCartLink.click(); // Example: click the link
+  const productName = page.locator("#tbodyid .name");
+  expect(productName).toHaveText(itemToAddToCart);
+  const addToCartBtn = page.locator(".btn-success");
+  await addToCartBtn.click();
+  page.on("dialog", (dialog) => dialog.accept());
+
+  // Validate the product in the cart
+  const navBarCartBtn = page.locator("#cartur");
+  await navBarCartBtn.click();
+  await page.locator(".success").first().waitFor();
+  const tdElementOfItem = page.locator(
+    `tr.success td:has-text("${itemToAddToCart}")`
+  );
+  await expect(tdElementOfItem).toHaveText(itemToAddToCart);
 
   await browser.close();
 });
