@@ -3,6 +3,6 @@ export default class CartPage {
     this.page = page;
     this.itemRow = page.locator(".success");
     this.itemName = this.itemRow.locator(`td:has-text("Samsung galaxy s6")`); // Move text to const files
-    this.deleteItemBtn = this.itemRow.locator('td a:has-text("Delete")')
+    this.deleteItemBtn = this.itemRow.locator('td a:has-text("Delete")');
   }
 }

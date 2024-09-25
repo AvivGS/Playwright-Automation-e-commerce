@@ -128,16 +128,16 @@ test("Check at least 1 laptop product is listed ", async () => {
   await page.waitForLoadState("load");
 
   await homePage.logoutBtn.waitFor();
-  await homePage.categoriesList.first().waitFor();
-  await homePage.laptopsCategoryBtn.click();
-  await laptopsPage.laptopCard.first().waitFor();
-  const laptopsCount = await laptopsPage.laptopCard.count();
+  await homePage.goToLaptopsCategory();
+
+  const laptopsCount = await laptopsPage.getLaptopsCount();
   expect(laptopsCount).toBeGreaterThan(0);
-  await laptopsPage.laptopTitle.first().isVisible();
-  const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
-  const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
-  expect(laptopTitle).toBeTruthy();
-  expect(laptopPrice).toBeTruthy();
+
+  const firstLaptopTitle = await laptopsPage.getFirstLaptopTitle();
+  expect(firstLaptopTitle).toBeTruthy();
+
+  const firstLaptopPrice = await laptopsPage.getFirstLaptopPrice();
+  expect(firstLaptopPrice).toBeTruthy();
 
   await browser.close();
 });
