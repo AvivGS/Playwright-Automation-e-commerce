@@ -1,4 +1,8 @@
 import { test, request, chromium, expect } from "@playwright/test";
+import HomePage from "../pages/HomePage";
+import ProductPage from "../pages/ProductPage";
+import CartPage from "../pages/CartPage";
+import LaptopsPage from "../pages/LaptopsPage";
 
 const url = "https://www.demoblaze.com/";
 const loginUrl = "https://api.demoblaze.com/login";
@@ -10,14 +14,16 @@ const loginPayload = {
 
 const cookieTokenName = "tokenp_";
 let cookieTokenValue = "";
-const itemToAddToCart = "Samsung galaxy s6";
+// const itemToAddToCart = "Samsung galaxy s6";
 
 test.beforeAll(async () => {
   const apiContext = await request.newContext();
   const loginResponse = await apiContext.post(loginUrl, { data: loginPayload });
   await expect(loginResponse).toBeOK();
   const loginResponseJson = await loginResponse.json();
-  cookieTokenValue = loginResponseJson.slice(loginResponseJson.indexOf(":") + 1).trim(); // Extracts the part after the colon
+  cookieTokenValue = loginResponseJson
+    .slice(loginResponseJson.indexOf(":") + 1)
+    .trim(); // Extracts the part after the colon
 });
 
 test("Add a product to cart", async () => {
@@ -25,6 +31,7 @@ test("Add a product to cart", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  // Extract to Utils File
   // Set the cookie with the token
   await context.addCookies([
     {
@@ -39,26 +46,22 @@ test("Add a product to cart", async () => {
   await page.goto(url);
   await page.waitForLoadState("load");
 
-  // Wait for the logout button to appear
-  const logoutBtn = page.locator('[id="logout2"]');
-  await logoutBtn.waitFor();
+  const homePage = new HomePage(page); // Create POManager class
+  const productPage = new ProductPage(page); // Create POManager class
+  const cartPage = new CartPage(page); // Create POManager class
 
-  const itemToAddToCartLink = page.locator(`a:text("${itemToAddToCart}")`);
-  await itemToAddToCartLink.click(); // Example: click the link
-  const productName = page.locator("#tbodyid .name");
-  expect(productName).toHaveText(itemToAddToCart);
-  const addToCartBtn = page.locator(".btn-success");
-  await addToCartBtn.click();
+  await homePage.logoutBtn.waitFor();
+
+  // Add product to cart
+  await homePage.itemToAddToCartLink.click();
+  await expect(productPage.productName).toHaveText("Samsung galaxy s6"); // Move text to const files
+  await productPage.addToCartBtn.click();
   page.on("dialog", (dialog) => dialog.accept());
 
   // Validate the product in the cart
-  const navBarCartBtn = page.locator("#cartur");
-  await navBarCartBtn.click();
-  await page.locator(".success").first().waitFor();
-  const tdElementOfItem = page.locator(
-    `tr.success td:has-text("${itemToAddToCart}")`
-  );
-  await expect(tdElementOfItem).toHaveText(itemToAddToCart);
+  await homePage.navBarCartBtn.click();
+  await cartPage.itemRow.first().waitFor();
+  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6"); // Move text to const files
 
   await browser.close();
 });
@@ -68,6 +71,9 @@ test("Delete a product from cart", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  const homePage = new HomePage(page);
+  const cartPage = new CartPage(page);
+
   // Set the cookie with the token
   await context.addCookies([
     {
@@ -82,23 +88,19 @@ test("Delete a product from cart", async () => {
   await page.goto(url);
   await page.waitForLoadState("load");
 
-  // Wait for the logout button to appear
-  const logoutBtn = page.locator('[id="logout2"]');
-  await logoutBtn.waitFor();
+  await homePage.logoutBtn.waitFor();
 
   // Validate the product in the cart
-  const navBarCartBtn = page.locator("#cartur");
-  await navBarCartBtn.click();
-  await page.locator(".success").first().waitFor();
-  const tdElementOfItem = page.locator(`tr.success td:has-text("${itemToAddToCart}")`);
-  await expect(tdElementOfItem).toHaveText(itemToAddToCart);
-  await page.locator(`tr.success td:has-text("Delete")`).waitFor();
-  const tdDeleteItem = page.locator(`tr.success td a:has-text("Delete")`);
+  await homePage.navBarCartBtn.click();
+  await cartPage.itemRow.first().waitFor();
+  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6"); // Move text to const files
 
-  await tdDeleteItem.click();
+  await cartPage.deleteItemBtn.waitFor();
+  await cartPage.deleteItemBtn.click();
+
   await page.reload();
   expect(async () => {
-    await expect(tdDeleteItem).not.toBeVisible();
+    await expect(cartPage.deleteItemBtn).not.toBeVisible();
   }).toPass();
   await browser.close();
 });
@@ -108,6 +110,9 @@ test("Check at least 1 laptop product is listed ", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  const homePage = new HomePage(page);
+  const laptopsPage = new LaptopsPage(page);
+
   // Set the cookie with the token
   await context.addCookies([
     {
@@ -122,18 +127,15 @@ test("Check at least 1 laptop product is listed ", async () => {
   await page.goto(url);
   await page.waitForLoadState("load");
 
-  // Wait for the logout button to appear
-  const logoutBtn = page.locator('[id="logout2"]');
-  await logoutBtn.waitFor();
-  await page.locator('[class="list-group-item"]').first().waitFor();
-  const laptopsTabBtn = page.locator(`.list-group-item:has-text("Laptops")`);
-  await laptopsTabBtn.click();
-  await page.locator(".card").first().waitFor();
-  const itemsCount = await page.locator(".card").count();
-  expect(itemsCount).toBeGreaterThan(0);
-  await page.locator(".card").first().locator("h4.card-title a").isVisible();
-  const laptopTitle = await page.locator(".card").first().locator("h4.card-title a").textContent();
-  const laptopPrice = await page.locator(".card").first().locator("h5").textContent();
+  await homePage.logoutBtn.waitFor();
+  await homePage.categoriesList.first().waitFor();
+  await homePage.laptopsCategoryBtn.click();
+  await laptopsPage.laptopCard.first().waitFor();
+  const laptopsCount = await laptopsPage.laptopCard.count();
+  expect(laptopsCount).toBeGreaterThan(0);
+  await laptopsPage.laptopTitle.first().isVisible();
+  const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
+  const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
   expect(laptopTitle).toBeTruthy();
   expect(laptopPrice).toBeTruthy();
 
