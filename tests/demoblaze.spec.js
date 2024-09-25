@@ -20,7 +20,7 @@ test.beforeAll(async () => {
   cookieTokenValue = loginResponseJson.slice(loginResponseJson.indexOf(":") + 1).trim(); // Extracts the part after the colon
 });
 
-test("Add a product to Cart", async () => {
+test("Add a product to cart", async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -60,5 +60,44 @@ test("Add a product to Cart", async () => {
   );
   await expect(tdElementOfItem).toHaveText(itemToAddToCart);
 
+  await browser.close();
+});
+
+test.only("Delete a product from cart", async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  // Set the cookie with the token
+  await context.addCookies([
+    {
+      name: cookieTokenName,
+      value: cookieTokenValue,
+      domain: ".demoblaze.com",
+      path: "/",
+      httpOnly: false,
+      secure: true,
+    },
+  ]);
+  await page.goto(url);
+  await page.waitForLoadState("load");
+
+  // Wait for the logout button to appear
+  const logoutBtn = page.locator('[id="logout2"]');
+  await logoutBtn.waitFor();
+
+  // Validate the product in the cart
+  const navBarCartBtn = page.locator("#cartur");
+  await navBarCartBtn.click();
+  await page.locator(".success").first().waitFor();
+  const tdElementOfItem = page.locator(`tr.success td:has-text("${itemToAddToCart}")`);
+  await expect(tdElementOfItem).toHaveText(itemToAddToCart);
+  await page.locator(`tr.success td:has-text("Delete")`).waitFor()
+  const tdDeleteItem = page.locator(`tr.success td a:has-text("Delete")`);
+
+  await tdDeleteItem.click()
+  expect(async () => {
+    await expect(tdElementOfItem).not.toBeVisible()
+  }).toPass()
   await browser.close();
 });
