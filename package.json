@@ -6,6 +6,14 @@
   "scripts": {
     "run-tests": "npx playwright test",
     "run-tests-headed": "npx playwright test --headed",
+    "chromium-headed": "npx playwright test --project=chromium --headed",
+    "chromium-headless": "npx playwright test --project=chromium --headless",
+    "firefox-headed": "npx playwright test --project=firefox --headed",
+    "firefox-headless": "npx playwright test --project=firefox --headless",
+    "chrome-headed": "npx playwright test --project=chromium --headed",
+    "chrome-headless": "npx playwright test --project=chromium --headless",
+    "webkit-headed": "npx playwright test --project=webkit --headed",
+    "webkit-headless": "npx playwright test --project=webkit --headless",
     "report": "npx playwright show-report",
     "debug": "npx playwright test --debug"
   },

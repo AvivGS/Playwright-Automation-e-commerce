@@ -63,7 +63,7 @@ test("Add a product to cart", async () => {
   await browser.close();
 });
 
-test.only("Delete a product from cart", async () => {
+test("Delete a product from cart", async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -92,12 +92,50 @@ test.only("Delete a product from cart", async () => {
   await page.locator(".success").first().waitFor();
   const tdElementOfItem = page.locator(`tr.success td:has-text("${itemToAddToCart}")`);
   await expect(tdElementOfItem).toHaveText(itemToAddToCart);
-  await page.locator(`tr.success td:has-text("Delete")`).waitFor()
+  await page.locator(`tr.success td:has-text("Delete")`).waitFor();
   const tdDeleteItem = page.locator(`tr.success td a:has-text("Delete")`);
 
-  await tdDeleteItem.click()
+  await tdDeleteItem.click();
+  await page.reload();
   expect(async () => {
-    await expect(tdElementOfItem).not.toBeVisible()
-  }).toPass()
+    await expect(tdDeleteItem).not.toBeVisible();
+  }).toPass();
+  await browser.close();
+});
+
+test("Check at least 1 laptop product is listed ", async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  // Set the cookie with the token
+  await context.addCookies([
+    {
+      name: cookieTokenName,
+      value: cookieTokenValue,
+      domain: ".demoblaze.com",
+      path: "/",
+      httpOnly: false,
+      secure: true,
+    },
+  ]);
+  await page.goto(url);
+  await page.waitForLoadState("load");
+
+  // Wait for the logout button to appear
+  const logoutBtn = page.locator('[id="logout2"]');
+  await logoutBtn.waitFor();
+  await page.locator('[class="list-group-item"]').first().waitFor();
+  const laptopsTabBtn = page.locator(`.list-group-item:has-text("Laptops")`);
+  await laptopsTabBtn.click();
+  await page.locator(".card").first().waitFor();
+  const itemsCount = await page.locator(".card").count();
+  expect(itemsCount).toBeGreaterThan(0);
+  await page.locator(".card").first().locator("h4.card-title a").isVisible();
+  const laptopTitle = await page.locator(".card").first().locator("h4.card-title a").textContent();
+  const laptopPrice = await page.locator(".card").first().locator("h5").textContent();
+  expect(laptopTitle).toBeTruthy();
+  expect(laptopPrice).toBeTruthy();
+
   await browser.close();
 });
