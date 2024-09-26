@@ -6,6 +6,8 @@ let context;
 let browser;
 const url = "https://www.demoblaze.com/";
 const productName = "Samsung galaxy s6";
+const addToCartUrl = "https://api.demoblaze.com/addtocart";
+
 
 /*
 // const loginUrl = "https://api.demoblaze.com/login";
@@ -56,6 +58,19 @@ test.describe("Cart functionality with shared state", () => {
     });
 
     await test.step("Add the product to the cart", async () => {
+      await page.route(addToCartUrl,
+        route=>{
+          const addToCartResponse = page.request.fetch(route.request())
+          const addToCartResponseJson = addToCartResponse.json();
+
+          if(addToCartResponseJson.id === true){
+            route.fulfill()
+          }
+          else {
+            route.abort();
+            throw new Error("The product was not added to the cart successfully.");
+          
+        }
       await productPage.addProductToCart();
     });
 
