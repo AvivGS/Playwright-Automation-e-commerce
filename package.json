@@ -6,6 +6,7 @@
   "scripts": {
     "run-tests": "npx playwright test",
     "run-tests-headed": "npx playwright test --headed",
+    "run-tests-headless": "npx playwright test --headless",
     "chromium-headed": "npx playwright test --project=chromium --headed",
     "chromium-headless": "npx playwright test --project=chromium --headless",
     "firefox-headed": "npx playwright test --project=firefox --headed",
