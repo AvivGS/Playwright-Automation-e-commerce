@@ -42,14 +42,10 @@ module.exports = defineConfig({
     //   use: { ...devices["Desktop Firefox"] },
     // },
 
-    // {
-    //   name: "Mobile Safari",
-    //   use: { ...devices["iPhone 12"] },
-    // },
-    // {
-    //   name: "Google Chrome",
-    //   use: { ...devices["Desktop Chrome"], channel: "chrome" },
-    // },
+    {
+      name: "Mobile Safari",
+      use: { ...devices["iPhone 12"] },
+    },
   ],
 
   /* Run your local dev server before starting the tests */

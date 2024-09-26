@@ -4,10 +4,12 @@ export default class HomePage {
   constructor(page) {
     this.page = page;
     this.logoutBtn = page.locator('[id="logout2"]');
-    this.itemToAddToCartLink = page.locator(`a:text("${productToAdd}")`);
     this.navBarCartBtn = page.locator("#cartur");
-    this.categoriesList = page.locator('.list-group-item')
-    this.laptopsCategoryBtn = page.locator(`.list-group-item:has-text("Laptops")`)
+    this.navBarHomeBtn = page.locator(`.nav-link:has-text("Home ")`);
+    this.categoriesList = page.locator(".list-group-item");
+    this.laptopsCategoryBtn = page.locator(
+      `.list-group-item:has-text("Laptops")`
+    );
   }
 
   goToLaptopsCategory = async () => {
@@ -15,11 +17,18 @@ export default class HomePage {
     await this.laptopsCategoryBtn.click();
   };
 
-  goToProductPage = async () => {
-    await this.itemToAddToCartLink.click();
+  goToProductPage = async (productToAdd) => {
+    const productToAddToCartLink = this.page.locator(
+      `a:text("${productToAdd}")`
+    );
+    await productToAddToCartLink.click();
   };
 
   goToCartPage = async () => {
     await this.navBarCartBtn.click();
+  };
+
+  goToHomePage = async () => {
+    await this.navBarHomeBtn.click();
   };
 }
