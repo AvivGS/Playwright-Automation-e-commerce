@@ -30,6 +30,7 @@ const errors = [];
 // });
 */
 
+// TODO = Move this to base page fixture that extends playwright "page" fixture
 const handlePageErrors = (error) => {
   errors.push(error.message);
 };
