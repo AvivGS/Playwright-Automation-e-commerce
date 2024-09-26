@@ -1,8 +1,5 @@
 import { test, request, chromium, expect } from "@playwright/test";
-import HomePage from "../pages/HomePage";
-import ProductPage from "../pages/ProductPage";
-import CartPage from "../pages/CartPage";
-import LaptopsPage from "../pages/LaptopsPage";
+import POManager from "../pages/POManager";
 
 const url = "https://www.demoblaze.com/";
 const loginUrl = "https://api.demoblaze.com/login";
@@ -31,7 +28,12 @@ test("Add a product to cart", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Extract to Utils File
+  const poManager = new POManager(page);
+
+  const homePage = poManager.getHomePage();
+  const productPage = poManager.getProductPage();
+  const cartPage = poManager.getCartPage();
+
   // Set the cookie with the token
   await context.addCookies([
     {
@@ -46,22 +48,17 @@ test("Add a product to cart", async () => {
   await page.goto(url);
   await page.waitForLoadState("load");
 
-  const homePage = new HomePage(page); // Create POManager class
-  const productPage = new ProductPage(page); // Create POManager class
-  const cartPage = new CartPage(page); // Create POManager class
-
   await homePage.logoutBtn.waitFor();
 
   // Add product to cart
-  await homePage.itemToAddToCartLink.click();
-  await expect(productPage.productName).toHaveText("Samsung galaxy s6"); // Move text to const files
-  await productPage.addToCartBtn.click();
-  page.on("dialog", (dialog) => dialog.accept());
+  await homePage.goToProductPage();
+  await expect(productPage.productName).toHaveText("Samsung galaxy s6");
+  await productPage.addProductToCart();
 
   // Validate the product in the cart
-  await homePage.navBarCartBtn.click();
+  await homePage.goToCartPage();
   await cartPage.itemRow.first().waitFor();
-  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6"); // Move text to const files
+  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6");
 
   await browser.close();
 });
@@ -71,8 +68,10 @@ test("Delete a product from cart", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  const homePage = new HomePage(page);
-  const cartPage = new CartPage(page);
+  const poManager = new POManager(page);
+
+  const homePage = poManager.getHomePage();
+  const cartPage = poManager.getCartPage();
 
   // Set the cookie with the token
   await context.addCookies([
@@ -91,12 +90,11 @@ test("Delete a product from cart", async () => {
   await homePage.logoutBtn.waitFor();
 
   // Validate the product in the cart
-  await homePage.navBarCartBtn.click();
+  await homePage.goToCartPage();
   await cartPage.itemRow.first().waitFor();
-  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6"); // Move text to const files
+  await expect(cartPage.itemName).toHaveText("Samsung galaxy s6");
 
-  await cartPage.deleteItemBtn.waitFor();
-  await cartPage.deleteItemBtn.click();
+  await cartPage.deleteItemFromCart();
 
   await page.reload();
   expect(async () => {
@@ -110,8 +108,10 @@ test("Check at least 1 laptop product is listed ", async () => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  const homePage = new HomePage(page);
-  const laptopsPage = new LaptopsPage(page);
+  const poManager = new POManager(page);
+
+  const homePage = poManager.getHomePage();
+  const laptopsPage = poManager.getLaptopsPage();
 
   // Set the cookie with the token
   await context.addCookies([
