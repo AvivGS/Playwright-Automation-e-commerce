@@ -6,7 +6,7 @@ let context;
 let browser;
 const url = "https://www.demoblaze.com/";
 const productName = "Samsung galaxy s6";
-
+const errors = [];
 /*
 // const loginUrl = "https://api.demoblaze.com/login";
 
@@ -30,11 +30,17 @@ const productName = "Samsung galaxy s6";
 // });
 */
 
+const handlePageErrors = (error) => {
+  errors.push(error.message);
+};
+
 test.describe("Cart functionality with shared state", () => {
   test.beforeAll(async ({ browser: testBrowser }) => {
     browser = testBrowser;
     context = await browser.newContext();
     page = await context.newPage();
+
+    page.on("pageerror", handlePageErrors);
   });
 
   test.beforeEach(async () => {
@@ -91,13 +97,13 @@ test.describe("Cart functionality with shared state", () => {
     await context.close();
   });
 });
-test("Check at least 1 laptop product is listed ", async () => {
+
+test("Check at least 1 laptop product is listed", async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
   const poManager = new POManager(page);
-
   const homePage = poManager.getHomePage();
   const laptopsPage = poManager.getLaptopsPage();
 
@@ -132,11 +138,17 @@ test("Check at least 1 laptop product is listed ", async () => {
 
     const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
     const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
-    
+
     await expect(laptopsPage.laptopTitle.first()).toBeVisible(); // Ensure the title is visible
     expect(laptopTitle).toBeTruthy();
     expect(laptopPrice).toBeTruthy();
   });
 
   await browser.close();
+});
+
+test.afterAll(() => {
+  if (errors.length > 0) {
+    console.error("Errors encountered during tests:", errors);
+  }
 });
