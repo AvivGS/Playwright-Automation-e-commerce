@@ -7,7 +7,7 @@ let browser;
 const url = "https://www.demoblaze.com/";
 const productName = "Samsung galaxy s6";
 const addToCartUrl = "https://api.demoblaze.com/addtocart";
-
+let requestCaptured = false;
 
 /*
 // const loginUrl = "https://api.demoblaze.com/login";
@@ -44,6 +44,14 @@ test.describe("Cart functionality with shared state", () => {
   });
 
   test("Add a product to cart", async () => {
+    // Listen for network requests
+    page.on("request", (request) => {
+      // Check if the request matches the specific URL or other criteria
+      if (request.url().includes(addToCartUrl) && request.method() === "POST") {
+        console.log("Add to cart request was sent!");
+        requestCaptured = true; // Set the flag to true when the request is captured
+      }
+    });
     const poManager = new POManager(page);
     const homePage = poManager.getHomePage();
     const productPage = poManager.getProductPage();
@@ -58,20 +66,11 @@ test.describe("Cart functionality with shared state", () => {
     });
 
     await test.step("Add the product to the cart", async () => {
-      await page.route(addToCartUrl,
-        route=>{
-          const addToCartResponse = page.request.fetch(route.request())
-          const addToCartResponseJson = addToCartResponse.json();
-
-          if(addToCartResponseJson.id === true){
-            route.fulfill()
-          }
-          else {
-            route.abort();
-            throw new Error("The product was not added to the cart successfully.");
-          
-        }
       await productPage.addProductToCart();
+      expect(requestCaptured).toBe(
+        true,
+        "Expected the 'Add to Cart' request to be sent."
+      );
     });
 
     await test.step("Validate the product in the cart", async () => {
@@ -147,7 +146,7 @@ test("Check at least 1 laptop product is listed ", async () => {
 
     const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
     const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
-    
+
     await expect(laptopsPage.laptopTitle.first()).toBeVisible(); // Ensure the title is visible
     expect(laptopTitle).toBeTruthy();
     expect(laptopPrice).toBeTruthy();
