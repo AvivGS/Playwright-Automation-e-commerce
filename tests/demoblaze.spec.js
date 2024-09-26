@@ -6,6 +6,8 @@ let context;
 let browser;
 const url = "https://www.demoblaze.com/";
 const productName = "Samsung galaxy s6";
+const addToCartUrl = "https://api.demoblaze.com/addtocart";
+let requestCaptured = false;
 
 test.describe("Cart functionality with shared state", () => {
   test.beforeAll(async ({ browser: testBrowser }) => {
@@ -31,7 +33,6 @@ test.describe("Cart functionality with shared state", () => {
         requestCaptured = true;
       }
     });
-
     const poManager = new POManager(page);
     const homePage = poManager.getHomePage();
     const productPage = poManager.getProductPage();
@@ -47,11 +48,15 @@ test.describe("Cart functionality with shared state", () => {
 
     await test.step("Add the product to the cart", async () => {
       await productPage.addProductToCart();
+      expect(requestCaptured).toBe(
+        true,
+        "Expected the 'Add to Cart' request to be sent."
+      );
     });
 
     await test.step("Validate the product in the cart", async () => {
       await homePage.goToCartPage();
-      await cartPage.itemRow.first().waitFor(); // Ensure at least one item is visible
+      await cartPage.itemRow.first().waitFor();
       await expect(cartPage.itemName).toHaveText(productName);
     });
   });
@@ -68,7 +73,7 @@ test.describe("Cart functionality with shared state", () => {
 
     await test.step("Navigate to cart page", async () => {
       await homePage.goToCartPage();
-      await cartPage.itemRow.first().waitFor(); // Ensure at least one item is visible
+      await cartPage.itemRow.first().waitFor();
       await expect(cartPage.itemName).toHaveText(productName);
     });
 
@@ -77,8 +82,8 @@ test.describe("Cart functionality with shared state", () => {
     });
 
     await test.step("Validate the cart is empty", async () => {
-      await page.reload(); // Reload the page to reflect the cart changes
-      await expect(cartPage.itemRow).toHaveCount(0); // Check if no items are left in the cart
+      await page.reload();
+      await expect(cartPage.itemRow).toHaveCount(0);
     });
   });
 
@@ -102,19 +107,19 @@ test("Check at least 1 laptop product is listed", async () => {
   });
 
   await test.step("Click on the laptops category", async () => {
-    await homePage.categoriesList.first().waitFor(); // Ensure categories are visible
+    await homePage.categoriesList.first().waitFor();
     await homePage.laptopsCategoryBtn.click();
   });
 
   await test.step("Check for available laptops", async () => {
-    await laptopsPage.laptopCard.first().waitFor(); // Ensure at least one laptop is visible
-    const laptopsCount = await laptopsPage.laptopCard.count(); // Get count of laptop cards
-    expect(laptopsCount).toBeGreaterThan(0); // Ensure there is at least one laptop
+    await laptopsPage.laptopCard.first().waitFor();
+    const laptopsCount = await laptopsPage.laptopCard.count();
+    expect(laptopsCount).toBeGreaterThan(0);
 
     const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
     const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
-    
-    await expect(laptopsPage.laptopTitle.first()).toBeVisible(); // Ensure the title is visible
+
+    await expect(laptopsPage.laptopTitle.first()).toBeVisible();
     expect(laptopTitle).toBeTruthy();
     expect(laptopPrice).toBeTruthy();
   });
