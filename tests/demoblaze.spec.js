@@ -52,7 +52,9 @@ test.describe("Cart functionality with shared state", () => {
     });
 
     await test.step("Verify product name on product page", async () => {
-      await expect(productPage.productName).toHaveText(productName);
+      await expect(productPage.productName).toHaveText(productName, {
+        message: `Expected product name to be "${productName}"`,
+      });
     });
 
     await test.step("Add the product to the cart", async () => {
@@ -62,7 +64,9 @@ test.describe("Cart functionality with shared state", () => {
     await test.step("Validate the product in the cart", async () => {
       await homePage.goToCartPage();
       await cartPage.itemRow.first().waitFor(); // Ensure at least one item is visible
-      await expect(cartPage.itemName).toHaveText(productName);
+      await expect(cartPage.itemName).toHaveText(productName, {
+        message: `Expected cart to contain "${productName}"`,
+      });
     });
   });
 
@@ -74,7 +78,9 @@ test.describe("Cart functionality with shared state", () => {
     await test.step("Navigate to cart page", async () => {
       await homePage.goToCartPage();
       await cartPage.itemRow.first().waitFor(); // Ensure at least one item is visible
-      await expect(cartPage.itemName).toHaveText(productName);
+      await expect(cartPage.itemName).toHaveText(productName, {
+        message: `Expected cart to contain "${productName}"`,
+      });
     });
 
     await test.step("Delete the product from the cart", async () => {
@@ -83,7 +89,9 @@ test.describe("Cart functionality with shared state", () => {
 
     await test.step("Validate the cart is empty", async () => {
       await page.reload(); // Reload the page to reflect the cart changes
-      await expect(cartPage.itemRow).toHaveCount(0); // Check if no items are left in the cart
+      await expect(cartPage.itemRow).toHaveCount(0, {
+        message: "Expected cart to be empty after deletion",
+      }); // Check if no items are left in the cart
     });
   });
 
@@ -128,14 +136,22 @@ test("Check at least 1 laptop product is listed ", async () => {
   await test.step("Check for available laptops", async () => {
     await laptopsPage.laptopCard.first().waitFor(); // Ensure at least one laptop is visible
     const laptopsCount = await laptopsPage.laptopCard.count(); // Get count of laptop cards
-    expect(laptopsCount).toBeGreaterThan(0); // Ensure there is at least one laptop
+    expect(laptopsCount).toBeGreaterThan(0, {
+      message: "Expected at least one laptop product to be listed",
+    });
 
     const laptopTitle = await laptopsPage.laptopTitle.first().textContent();
     const laptopPrice = await laptopsPage.laptopPrice.first().textContent();
-    
-    await expect(laptopsPage.laptopTitle.first()).toBeVisible(); // Ensure the title is visible
-    expect(laptopTitle).toBeTruthy();
-    expect(laptopPrice).toBeTruthy();
+
+    await expect(laptopsPage.laptopTitle.first()).toBeVisible({
+      message: "Expected the laptop title to be visible",
+    });
+    expect(laptopTitle).toBeTruthy({
+      message: "Expected a valid laptop title, but it was empty or null.",
+    });
+    expect(laptopPrice).toBeTruthy({
+      message: "Expected a valid laptop price, but it was empty or null.",
+    });
   });
 
   await browser.close();

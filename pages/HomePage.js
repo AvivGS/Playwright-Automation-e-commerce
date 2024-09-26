@@ -1,5 +1,3 @@
-const productToAdd = "Samsung galaxy s6";
-
 export default class HomePage {
   constructor(page) {
     this.page = page;
