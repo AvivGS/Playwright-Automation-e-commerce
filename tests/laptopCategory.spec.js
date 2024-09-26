@@ -1,7 +1,6 @@
 import { test, chromium, expect } from "@playwright/test";
 import POManager from "../pages/POManager";
-
-const url = "https://www.demoblaze.com/";
+import dataSet from "../Utils/data.json";
 
 test("Check at least 1 laptop product is listed ", async () => {
   const browser = await chromium.launch();
@@ -28,7 +27,7 @@ test("Check at least 1 laptop product is listed ", async () => {
     */
 
   await test.step("Navigate to home page", async () => {
-    await page.goto(url);
+    await page.goto(dataSet.url);
     await page.waitForLoadState("load");
   });
 
