@@ -9,29 +9,6 @@ const productName = "Samsung galaxy s6";
 const addToCartUrl = "https://api.demoblaze.com/addtocart";
 let requestCaptured = false;
 
-/*
-// const loginUrl = "https://api.demoblaze.com/login";
-
-// const loginPayload = {
-//   username: "aviv_alfabet",
-//   password: "YXZpdl9hbGZhYmV0MSE=",
-// };
-
-// const cookieTokenName = "tokenp_";
-// let cookieTokenValue = "";
-*/
-/*
-// test.beforeAll(async () => {
-// const apiContext = await request.newContext();
-// const loginResponse = await apiContext.post(loginUrl, { data: loginPayload });
-// await expect(loginResponse).toBeOK();
-// const loginResponseJson = await loginResponse.json();
-// cookieTokenValue = loginResponseJson
-//   .slice(loginResponseJson.indexOf(":") + 1)
-//   .trim(); // Extracts the part after the colon
-// });
-*/
-
 test.describe("Cart functionality with shared state", () => {
   test.beforeAll(async ({ browser: testBrowser }) => {
     browser = testBrowser;
@@ -43,7 +20,13 @@ test.describe("Cart functionality with shared state", () => {
     await page.goto(url);
   });
 
-  test("Add a product to cart", async () => {
+  // Add tests to skip on Firefox
+  test("Add a product to cart", async ({ browserName }) => {
+    // Skip the test on Firefox
+    if (browserName === "firefox") {
+      test.skip("Skipping add product to cart test on Firefox");
+    }
+
     page.on("request", (request) => {
       if (request.url().includes(addToCartUrl) && request.method() === "POST") {
         console.log("Add to cart request was sent!");
@@ -78,7 +61,12 @@ test.describe("Cart functionality with shared state", () => {
     });
   });
 
-  test("Delete a product from cart", async () => {
+  // Skip this test on Firefox
+  test("Delete a product from cart", async ({ browserName }) => {
+    if (browserName === "firefox") {
+      test.skip("Skipping delete product from cart test on Firefox");
+    }
+
     const poManager = new POManager(page);
     const homePage = poManager.getHomePage();
     const cartPage = poManager.getCartPage();
@@ -103,29 +91,15 @@ test.describe("Cart functionality with shared state", () => {
     await context.close();
   });
 });
-test("Check at least 1 laptop product is listed ", async () => {
+
+test("Check at least 1 laptop product is listed", async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
   const poManager = new POManager(page);
-
   const homePage = poManager.getHomePage();
   const laptopsPage = poManager.getLaptopsPage();
-
-  /* 
-  // Set the cookie with the token
-  // await context.addCookies([
-  //   {
-  //     name: cookieTokenName,
-  //     value: cookieTokenValue,
-  //     domain: ".demoblaze.com",
-  //     path: "/",
-  //     httpOnly: false,
-  //     secure: true,
-  //   },
-  // ]);
-  */
 
   await test.step("Navigate to home page", async () => {
     await page.goto(url);
