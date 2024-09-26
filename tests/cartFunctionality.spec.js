@@ -5,10 +5,6 @@ import dataSet from "../Utils/data.json";
 let page;
 let context;
 let browser;
-
-const url = "https://www.demoblaze.com/";
-const productName = "Samsung galaxy s6";
-const addToCartUrl = "https://api.demoblaze.com/addtocart";
 let requestCaptured = false;
 
 test.describe("Cart functionality with shared state", () => {
@@ -28,7 +24,10 @@ test.describe("Cart functionality with shared state", () => {
     }
 
     page.on("request", (request) => {
-      if (request.url().includes(addToCartUrl) && request.method() === "POST") {
+      if (
+        request.url().includes(dataSet.addToCartUrl) &&
+        request.method() === "POST"
+      ) {
         console.log("Add to cart request was sent!");
         requestCaptured = true;
       }

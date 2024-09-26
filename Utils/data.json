@@ -1,4 +1,5 @@
 {
     "url" : "https://www.demoblaze.com/",
-    "productName" : "Samsung galaxy s6"
+    "productName" : "Samsung galaxy s6",
+    "addToCartUrl" : "https://api.demoblaze.com/addtocart"
 }
