@@ -1,4 +1,4 @@
-# alfabet_automation
+# Playwright automation for 'DemoBlaze' - An E-Commerce website 
 
 Go to this url: https://github.com/AvivGS/alfabet_automation
 
