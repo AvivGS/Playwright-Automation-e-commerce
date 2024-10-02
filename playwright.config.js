@@ -2,12 +2,6 @@
 const { defineConfig, devices } = require("@playwright/test");
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-
-/**
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
@@ -27,11 +21,18 @@ module.exports = defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    /* Timeout for actions such as `click`, `fill`, etc. */
+    actionTimeout: 5000,  // Set the default timeout for actions to 5 seconds
+
+    /* Timeout for expect assertions */
+    expect: {
+      timeout: 5000, // Set the default timeout for expect assertions to 5 seconds
+    },
+
+    /* Collect trace when retrying the failed test. */
     trace: "retain-on-failure",
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: "chromium",
@@ -41,7 +42,6 @@ module.exports = defineConfig({
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
     },
-
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 12"] },
