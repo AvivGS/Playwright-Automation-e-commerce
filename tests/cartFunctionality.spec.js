@@ -1,11 +1,13 @@
 import { test, expect } from "@playwright/test";
 import POManager from "../pages/POManager";
 import dataSet from "../Utils/data.json";
+import ActionUtils from "../Utils/ActionUtils";
 
 let page;
 let context;
 let browser;
 let requestCaptured = false;
+let actionUtils;
 
 test.describe("Cart functionality with shared state", () => {
   test.beforeAll(async ({ browser: testBrowser }) => {
@@ -13,6 +15,7 @@ test.describe("Cart functionality with shared state", () => {
       browser = testBrowser;
       context = await browser.newContext();
       page = await context.newPage();
+      actionUtils = new ActionUtils(page);
     } catch (error) {
       console.error("Error during setup in beforeAll:", error);
       throw error;
@@ -50,51 +53,30 @@ test.describe("Cart functionality with shared state", () => {
       const cartPage = poManager.getCartPage();
 
       await test.step("Navigate to product page", async () => {
-        try {
-          await homePage.goToProductPage(dataSet.productName);
-        } catch (error) {
-          console.error("Error navigating to product page:", error);
-          throw error;
-        }
+        await homePage.goToProductPage(dataSet.productName);
       });
 
       await test.step("Verify product name on product page", async () => {
-        try {
-          await expect(productPage.productName).toHaveText(dataSet.productName, {
-            message: `Expected product name to be "${dataSet.productName}"`,
-          });
-        } catch (error) {
-          console.error("Error verifying product name:", error);
-          throw error;
-        }
+        await expect(productPage.productName).toHaveText(dataSet.productName, {
+          message: `Expected product name to be "${dataSet.productName}"`,
+        });
       });
 
       await test.step("Add the product to the cart", async () => {
-        try {
-          await productPage.addProductToCart();
-          expect(requestCaptured).toBe(
-            true,
-            "Expected the 'Add to Cart' request to be sent."
-          );
-        } catch (error) {
-          console.error("Error adding product to cart:", error);
-          throw error;
-        }
+        await productPage.addProductToCart();
+        expect(requestCaptured).toBe(
+          true,
+          "Expected the 'Add to Cart' request to be sent."
+        );
       });
 
       await test.step("Validate the product in the cart", async () => {
-        try {
-          await homePage.goToCartPage();
-          await cartPage.itemRow.first().waitFor();
-          await expect(cartPage.itemName).toHaveText(dataSet.productName, {
-            message: `Expected cart to contain "${dataSet.productName}"`,
-          });
-        } catch (error) {
-          console.error("Error validating product in cart:", error);
-          throw error;
-        }
+        await homePage.goToCartPage();
+        await actionUtils.waitForElement(cartPage.itemRow.first());
+        await expect(cartPage.itemName).toHaveText(dataSet.productName, {
+          message: `Expected cart to contain "${dataSet.productName}"`,
+        });
       });
-
     } catch (error) {
       console.error("Test 'Add a product to cart' failed:", error);
       throw error;
@@ -112,39 +94,23 @@ test.describe("Cart functionality with shared state", () => {
       const cartPage = poManager.getCartPage();
 
       await test.step("Navigate to cart page", async () => {
-        try {
-          await homePage.goToCartPage();
-          await cartPage.itemRow.first().waitFor();
-          await expect(cartPage.itemName).toHaveText(dataSet.productName, {
-            message: `Expected cart to contain "${dataSet.productName}"`,
-          });
-        } catch (error) {
-          console.error("Error navigating to cart page or verifying product:", error);
-          throw error;
-        }
+        await homePage.goToCartPage();
+        await actionUtils.waitForElement(cartPage.itemRow.first());
+        await expect(cartPage.itemName).toHaveText(dataSet.productName, {
+          message: `Expected cart to contain "${dataSet.productName}"`,
+        });
       });
 
       await test.step("Delete the product from the cart", async () => {
-        try {
-          await cartPage.deleteItemFromCart();
-        } catch (error) {
-          console.error("Error deleting product from cart:", error);
-          throw error;
-        }
+        await cartPage.deleteItemFromCart();
       });
 
       await test.step("Validate the cart is empty", async () => {
-        try {
-          await page.reload();
-          await expect(cartPage.itemRow).toHaveCount(0, {
-            message: "Expected cart to be empty after deletion",
-          });
-        } catch (error) {
-          console.error("Error validating the empty cart:", error);
-          throw error;
-        }
+        await page.reload();
+        await expect(cartPage.itemRow).toHaveCount(0, {
+          message: "Expected cart to be empty after deletion",
+        });
       });
-
     } catch (error) {
       console.error("Test 'Delete a product from cart' failed:", error);
       throw error;
