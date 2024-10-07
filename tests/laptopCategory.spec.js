@@ -2,18 +2,21 @@ import { test, chromium, expect } from "@playwright/test";
 import POManager from "../pages/POManager";
 import dataSet from "../Utils/data.json";
 import ActionUtils from "../Utils/ActionUtils";
+import NetworkUtils from "../Utils/NetworkUtils";
 
 test("Check at least 1 laptop product is listed", async () => {
   let browser;
   let context;
   let page;
   let actionUtils;
+  let networkUtils;
 
   try {
     browser = await chromium.launch();
     context = await browser.newContext();
     page = await context.newPage();
     actionUtils = new ActionUtils(page);
+    networkUtils = new NetworkUtils(page);
 
     const poManager = new POManager(page);
     const homePage = poManager.getHomePage();
@@ -44,7 +47,10 @@ test("Check at least 1 laptop product is listed", async () => {
       expect(laptopPrice).toBeTruthy();
     });
   } catch (error) {
-    console.error("Test 'Check at least 1 laptop product is listed' failed:", error);
+    console.error(
+      "Test 'Check at least 1 laptop product is listed' failed:",
+      error
+    );
     throw error;
   } finally {
     if (browser) {
