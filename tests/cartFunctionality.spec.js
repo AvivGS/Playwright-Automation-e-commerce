@@ -2,12 +2,13 @@ import { test, expect } from "@playwright/test";
 import POManager from "../pages/POManager";
 import dataSet from "../Utils/data.json";
 import ActionUtils from "../Utils/ActionUtils";
+import NetworkUtils from "../Utils/NetworkUtils";
 
 let page;
 let context;
 let browser;
-let requestCaptured = false;
 let actionUtils;
+let networkUtils;
 
 test.describe("Cart functionality with shared state", () => {
   test.beforeAll(async ({ browser: testBrowser }) => {
@@ -16,6 +17,7 @@ test.describe("Cart functionality with shared state", () => {
       context = await browser.newContext();
       page = await context.newPage();
       actionUtils = new ActionUtils(page);
+      networkUtils = new NetworkUtils(page);
     } catch (error) {
       console.error("Error during setup in beforeAll:", error);
       throw error;
@@ -37,15 +39,7 @@ test.describe("Cart functionality with shared state", () => {
     }
 
     try {
-      page.on("request", (request) => {
-        if (
-          request.url().includes(dataSet.addToCartUrl) &&
-          request.method() === "POST"
-        ) {
-          console.log("Add to cart request was sent!");
-          requestCaptured = true;
-        }
-      });
+      networkUtils.captureRequest(dataSet.addToCartUrl, "POST");
 
       const poManager = new POManager(page);
       const homePage = poManager.getHomePage();
@@ -64,9 +58,12 @@ test.describe("Cart functionality with shared state", () => {
 
       await test.step("Add the product to the cart", async () => {
         await productPage.addProductToCart();
+        const requestCaptured = networkUtils.verifyRequestCaptured(
+          dataSet.addToCartUrl
+        );
         expect(requestCaptured).toBe(
           true,
-          "Expected the 'Add to Cart' request to be sent."
+          "Expected 'Add to Cart' request to be captured."
         );
       });
 
