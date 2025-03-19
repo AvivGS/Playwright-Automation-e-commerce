@@ -9,12 +9,12 @@ Using terminal, navigate to your desired directory:
   cd path/to/your/directory
   
 Clone the repository to your desired directory
-  git clone https://github.com/<your-username>/alfabet_automation.git
+  git clone https://github.com/<your-username>/<project_name>.git
     OR
   Open it by Github Desktop
   
 Navigate to the Cloned Repository:
-  cd alfabet_automation
+  cd <project_name>
   
 Install Dependencies
   npm install
