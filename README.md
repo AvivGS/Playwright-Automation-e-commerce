@@ -1,6 +1,6 @@
 # Playwright automation for 'DemoBlaze' - An E-Commerce website 
 
-Go to this url: https://github.com/AvivGS/alfabet_automation
+Go to this url: https://github.com/AvivGS/Playwright-Automation-e-commerce
 
 Once you're on the main page of the repository, look for the green "Code" button.
 Click on it, and you'll see options for HTTPS, SSH, or GitHub CLI. Choose your preferred method (HTTPS is commonly used).
